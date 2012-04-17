@@ -82,7 +82,7 @@ public class TextFileIndexer {
                 docIds.add(termDocs.doc());
             }
             System.out.println(t.text());
-            pw.write(t.text() + " -> " + docIds.toString() + "\n");
+            pw.write(t.text() + docIds.toString() + "\n");
         }
         pw.close();
         System.out.println("Number of documents: " + r.numDocs());
