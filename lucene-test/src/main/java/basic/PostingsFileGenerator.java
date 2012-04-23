@@ -25,14 +25,16 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 
 /**
- * THIS CLASS HAS BEEN COPIED FROM:
+ * Creates a postings file based on a Lucene-index. The format of the postings-file is 
+ * 
+ * This class has been copied from:
  * http://www.lucenetutorial.com/sample-apps/textfileindexer-java.html Several
  * changes have been made to fit my use case.
  */
 
-public class TextFileIndexer {
+public class PostingsFileGenerator {
 
-    private static final Logger log = Logger.getLogger(TextFileIndexer.class);
+    private static final Logger log = Logger.getLogger(PostingsFileGenerator.class);
 
     private IndexWriter writer;
     private List<File> queue = new ArrayList<File>();
@@ -40,17 +42,14 @@ public class TextFileIndexer {
     public static void main(String[] args) throws IOException {
 
         String indexDir = "/Users/zaeggi/UniMelbourne/semester3/comp90042_websearch/project1/index-dir";
-        TextFileIndexer indexer = null;
+        PostingsFileGenerator indexer = null;
         try {
-            indexer = new TextFileIndexer(indexDir);
+            indexer = new PostingsFileGenerator(indexDir);
         } catch (Exception e) {
             log.error("Cannot create index...", e);
             System.exit(-1);
         }
 
-        // ===================================================
-        // read input from user until he enters q for quit
-        // ===================================================
         String path = null;
         try {
             path = "/Users/zaeggi/UniMelbourne/semester3/comp90042_websearch/project1/reuters/test";
@@ -59,21 +58,15 @@ public class TextFileIndexer {
         } catch (Exception e) {
             log.error("Error indexing " + path + " : ", e);
         }
-
-        // ===================================================
-        // after adding, we always have to call the
-        // closeIndex, otherwise the index is not created
-        // ===================================================
         indexer.closeIndex();
-
+        
         Directory d = FSDirectory.open(new File(indexDir));
         IndexReader r = IndexReader.open(d);
 
         TermEnum terms = r.terms();
         
-        PrintWriter pw = new PrintWriter(new File("output.txt"));
+        PrintWriter pw = new PrintWriter(new File("postings-list.txt"));
         
-        Map<String, List<Integer>> postings = new HashMap<String, List<Integer>>();
         while(terms.next()) {
             Term t = terms.term();
             TermDocs termDocs = r.termDocs(t);
@@ -81,7 +74,6 @@ public class TextFileIndexer {
             while(termDocs.next()) {
                 docIds.add(termDocs.doc());
             }
-            System.out.println(t.text());
             pw.write(t.text() + docIds.toString() + "\n");
         }
         pw.close();
@@ -95,7 +87,7 @@ public class TextFileIndexer {
      *            the name of the folder in which the index should be created
      * @throws java.io.IOException
      */
-    TextFileIndexer(String indexDir) throws IOException {
+    PostingsFileGenerator(String indexDir) throws IOException {
         // the boolean true parameter means to create a new index every time,
         // potentially overwriting any existing files there.
         FSDirectory dir = FSDirectory.open(new File(indexDir));
@@ -118,11 +110,6 @@ public class TextFileIndexer {
      * @throws java.io.IOException
      */
     public void indexFileOrDirectory(String fileName) throws IOException {
-        // ===================================================
-        // gets the list of files in a folder (if user has submitted
-        // the name of a folder) or gets a single file name (is user
-        // has submitted only the file name)
-        // ===================================================
         addFiles(new File(fileName));
 
         int originalNumDocs = writer.numDocs();
@@ -130,19 +117,10 @@ public class TextFileIndexer {
             FileReader fr = null;
             try {
                 Document doc = new Document();
-
-                // ===================================================
-                // add contents of file
-                // ===================================================
                 fr = new FileReader(f);
                 doc.add(new Field("contents", fr));
-
-                // ===================================================
-                // adding second field which contains the path of the file
-                // ===================================================
                 doc.add(new Field("path", fileName, Field.Store.YES,
                         Field.Index.NOT_ANALYZED));
-
                 writer.addDocument(doc);
             } catch (Exception e) {
                 log.error("Could not add: " + f, e);
