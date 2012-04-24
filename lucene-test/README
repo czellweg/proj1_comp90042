@@ -1,0 +1,25 @@
+What is the Postings File Generator (PFG)?
+------------------------------------------
+
+PFG creates an index an outputs a file ('postings-list.txt') containing the 
+postings of all the indexed terms in the format 'term[docId1, docId2, ..., docIdn]'.
+
+Because I did not have an inverted file (postings list) of any index and I 
+didn't want to hand-make one, I've quickly came up with a generator using
+Apache Lucene.
+
+
+How to use the Postings File Generator (PFG)
+--------------------------------------------
+
+You can build your own postings file if you want to using the provided jar
+PFG-0.0.1-SNAPSHOT-jar-with-dependencies.jar. This jar already contains all
+needed dependencies so no repackaging (create a jar) is necessary.
+
+Usage: java -jar PFG-0.0.1-SNAPSHOT-jar-with-dependencies.jar <path to indexdir> <path to dir to be indexed>
+
+<path to indexdir>: this is the folder where Lucene stores its data for the 
+					index in, can be an arbitrary folder, preferably empty
+
+<path to dir to be indexed>: this is the location PFG picks up and 
+					indexes. I've used NLTKs Reuters corpora folder here.

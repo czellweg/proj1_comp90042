@@ -41,7 +41,15 @@ public class PostingsFileGenerator {
 
     public static void main(String[] args) throws IOException {
 
-        String indexDir = "/Users/zaeggi/UniMelbourne/semester3/comp90042_websearch/project1/index-dir";
+        if (args.length != 2) {
+            System.out.println("Usage: java -jar PFG.jar <path to indexdir> <path to dir to be indexed>");
+            System.out.println("-------------------------------------------");
+            System.out.println("Please provide the index directory to store " +
+            		"the lucene index in and the directory which is to be indexed.");
+            System.exit(-1);
+        }
+        
+        String indexDir = args[0];
         PostingsFileGenerator indexer = null;
         try {
             indexer = new PostingsFileGenerator(indexDir);
@@ -52,7 +60,7 @@ public class PostingsFileGenerator {
 
         String path = null;
         try {
-            path = "/Users/zaeggi/UniMelbourne/semester3/comp90042_websearch/project1/reuters/test";
+            path = args[1];
             // try to add file into the index
             indexer.indexFileOrDirectory(path);
         } catch (Exception e) {
